@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Allowance Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      font-size: 1rem;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .message {
+      margin-top: 1rem;
+      min-height: 1.5rem;
+      color: red;
+      text-align: center;
+    }
+    .result {
+      margin-top: 1rem;
+      padding: 15px;
+      background-color: #e6ffed;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      white-space: pre-line;
+    }
+    .result.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Daily Allowance Calculator</h1>
+    <form id="allowance-form">
+      <label for="payday">Next payday</label>
+      <input type="date" id="payday" required>
+      <label for="money">Amount you have (£)</label>
+      <input type="number" id="money" min="0" step="0.01" required>
+      <button type="submit">Calculate</button>
+    </form>
+    <div id="message" class="message"></div>
+    <div id="result" class="result"></div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const paydayInput = document.getElementById('payday');
+      const moneyInput = document.getElementById('money');
+      const form = document.getElementById('allowance-form');
+      const messageEl = document.getElementById('message');
+      const resultEl = document.getElementById('result');
+
+      // Load saved values
+      if (localStorage.getItem('payday')) {
+        paydayInput.value = localStorage.getItem('payday');
+      }
+      if (localStorage.getItem('money')) {
+        moneyInput.value = localStorage.getItem('money');
+      }
+
+      // Autofocus
+      paydayInput.focus();
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        messageEl.textContent = '';
+        resultEl.textContent = '';
+        resultEl.classList.remove('visible');
+
+        const paydayValue = paydayInput.value;
+        const moneyValue = parseFloat(moneyInput.value);
+
+        // Validation
+        const today = new Date();
+        const paydayDate = new Date(paydayValue);
+        today.setHours(0,0,0,0);
+        paydayDate.setHours(0,0,0,0);
+
+        if (!paydayValue) {
+          messageEl.textContent = 'Please choose your next payday date.';
+          return;
+        }
+        if (paydayDate <= today) {
+          messageEl.textContent = 'Please choose a future date for payday.';
+          return;
+        }
+        if (isNaN(moneyValue) || moneyValue <= 0) {
+          messageEl.textContent = 'Enter a positive amount of money.';
+          return;
+        }
+
+        // Calculate days difference
+        const diffTime = paydayDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        // Calculate allowance
+        const allowance = (moneyValue / diffDays).toFixed(2);
+
+        // Save inputs
+        localStorage.setItem('payday', paydayValue);
+        localStorage.setItem('money', moneyValue.toString());
+
+        // Display result with breakdown
+        resultEl.textContent =
+          `There are ${diffDays} days until payday.
+Calculation: £${moneyValue.toFixed(2)} ÷ ${diffDays} = £${allowance}
+
+You can spend £${allowance} per day until payday 🎉`;
+        setTimeout(() => {
+          resultEl.classList.add('visible');
+        }, 50);
+      });
+    });
+  </script>
+</body>
+</html>
