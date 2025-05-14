@@ -86,7 +86,7 @@
     <form id="allowance-form">
       <label for="payday">Next payday</label>
       <input type="date" id="payday" required>
-      <label for="money">Amount you have (£)</label>
+      <label for="money">Amount you have ($)</label>
       <input type="number" id="money" min="0" step="0.01" required>
       <button type="submit">Calculate</button>
     </form>
@@ -154,9 +154,9 @@
         // Display result with breakdown
         resultEl.textContent =
           `There are ${diffDays} days until payday.
-Calculation: £${moneyValue.toFixed(2)} ÷ ${diffDays} = £${allowance}
+Calculation: $${moneyValue.toFixed(2)} ÷ ${diffDays} = $${allowance}
 
-You can spend £${allowance} per day until payday 🎉`;
+You can spend $${allowance} per day until payday 🎉`;
         setTimeout(() => {
           resultEl.classList.add('visible');
         }, 50);
